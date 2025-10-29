@@ -42,23 +42,33 @@ class BarangRusakController extends Controller
         // ambil data barang terkait
         $barang = Barang::findOrFail($request->id_barang);
 
-        // simpan ke tabel barang_rusak
+        // siapkan data untuk tabel barang_rusak
         $data = [
-            'id_barang' => $barang->id_barang,
-            'kondisi_awal' => $barang->kondisi,
-            'kondisi_baru' => $validated['kondisi_baru'],
+            'id_barang'     => $barang->id_barang,
+            'kondisi_awal'  => $barang->kondisi,
+            'kondisi_baru'  => $validated['kondisi_baru'],
             'tanggal_catat' => Carbon::now(),
         ];
 
+        // kalau upload foto bukti kerusakan
         if ($request->hasFile('foto_bukti')) {
-            $data['foto_bukti'] = $request->file('foto_bukti')->store('rusak', 'public');
+            $fotoBaru = $request->file('foto_bukti')->store('rusak', 'public');
+            $data['foto_bukti'] = $fotoBaru;
+
+            // 🔄 update foto_barang di tabel barang
+            if ($barang->foto_barang) {
+                Storage::disk('public')->delete($barang->foto_barang);
+            }
+            $barang->update(['foto_barang' => $fotoBaru]);
         }
 
+        // simpan ke tabel barang_rusak
         BarangRusak::create($data);
 
         // update kondisi barang utama
         $barang->update(['kondisi' => $validated['kondisi_baru']]);
 
-        return redirect()->route('barang-rusak.index')->with('success', 'Data barang rusak berhasil disimpan dan kondisi barang telah diperbarui.');
+        return redirect()->route('barang-rusak.index')
+            ->with('success', 'Data barang rusak berhasil disimpan, kondisi dan foto barang telah diperbarui.');
     }
 }

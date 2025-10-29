@@ -15,7 +15,81 @@
   <a href="{{ route('barang.create') }}" class="btn btn-primary">
     <i class="bi bi-plus-lg"></i> Tambah Barang
   </a>
+
+  {{-- Tombol Cetak Barcode --}}
+  <a href="{{ route('barang.cetak.barcode', request()->query()) }}" class="btn btn-success">
+    <i class="bi bi-upc-scan"></i> Cetak Barcode
+  </a>
 </div>
+
+
+<div class="card mb-3 shadow-sm">
+  <div class="card-body">
+    <form method="GET" action="{{ route('barang.index') }}" class="row g-2 align-items-end">
+      <div class="col-md-2">
+        <label class="form-label mb-1">Fakultas</label>
+        <select name="fakultas" id="fakultas" class="form-select">
+          <option value="">Semua</option>
+          @foreach($fakultas as $f)
+            <option value="{{ $f->id_fakultas }}" {{ request('fakultas') == $f->id_fakultas ? 'selected' : '' }}>
+              {{ $f->kode_fakultas }}
+            </option>
+          @endforeach
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label mb-1">Gedung</label>
+        <select name="gedung" id="gedung" class="form-select">
+          <option value="">Semua</option>
+          @foreach($gedung as $g)
+            <option value="{{ $g->id_gedung }}" {{ request('gedung') == $g->id_gedung ? 'selected' : '' }}>
+              {{ $g->kode_gedung }} ({{ $g->fakultas->kode_fakultas }})
+            </option>
+          @endforeach
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label mb-1">Ruang</label>
+        <select name="ruang" id="ruang" class="form-select">
+          <option value="">Semua</option>
+          @foreach($ruang as $r)
+            <option value="{{ $r->id_ruang }}" {{ request('ruang') == $r->id_ruang ? 'selected' : '' }}>
+              {{ $r->nama_ruang }}
+            </option>
+          @endforeach
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label mb-1">Kondisi</label>
+        <select name="kondisi" class="form-select">
+          <option value="">Semua</option>
+          @foreach($kondisiList as $k)
+            <option value="{{ $k }}" {{ request('kondisi') == $k ? 'selected' : '' }}>
+              {{ $k == 'B' ? 'Baik' : ($k == 'RR' ? 'Rusak Ringan' : 'Rusak Berat') }}
+            </option>
+          @endforeach
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label mb-1">Cari Barang</label>
+        <input type="text" name="search" class="form-control" value="{{ request('search') }}" placeholder="Nama / Kode">
+      </div>
+
+      <div class="col-md-2 text-end">
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-filter"></i> Filter</button>
+        <a href="{{ route('barang.index') }}" class="btn btn-outline-secondary w-100 mt-2">
+          <i class="bi bi-arrow-clockwise"></i> Reset
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+
 
 <div class="card shadow-sm">
   <div class="card-body table-responsive">

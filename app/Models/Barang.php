@@ -37,4 +37,15 @@ class Barang extends Model
     {
         return $this->hasMany(BarangPindah::class, 'id_barang', 'id_barang');
     }
+
+    public function riwayatRusak()
+    {
+        return $this->hasMany(BarangRusak::class, 'id_barang', 'id_barang');
+    }
+
+    public function riwayatPindah()
+    {
+        return $this->hasMany(BarangPindah::class, 'id_barang', 'id_barang');
+    }
+
 }
