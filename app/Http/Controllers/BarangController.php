@@ -243,4 +243,81 @@ class BarangController extends Controller
 
         return $pdf->stream('Daftar-Barcode-Barang.pdf');
     }
+
+    // =======================
+    // CETAK PDF DATA BARANG
+    // =======================
+    public function cetakPdf(Request $request)
+    {
+        $query = Barang::with('ruang.gedung.fakultas');
+
+        // Filter fakultas
+        if ($request->filled('fakultas')) {
+            $query->whereHas('ruang.gedung.fakultas', function ($q) use ($request) {
+                $q->where('id_fakultas', $request->fakultas);
+            });
+        }
+
+        // Filter gedung
+        if ($request->filled('gedung')) {
+            $query->whereHas('ruang.gedung', function ($q) use ($request) {
+                $q->where('id_gedung', $request->gedung);
+            });
+        }
+
+        // Filter ruang
+        if ($request->filled('ruang')) {
+            $query->where('id_ruang', $request->ruang);
+        }
+
+        // Filter kondisi
+        if ($request->filled('kondisi')) {
+            $query->where('kondisi', $request->kondisi);
+        }
+
+        // Pencarian
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nama_barang', 'like', "%{$request->search}%")
+                ->orWhere('kode_barang', 'like', "%{$request->search}%");
+            });
+        }
+
+        $barang = $query->orderBy('id_barang', 'asc')->get();
+
+        // Render PDF
+        $pdf = Pdf::loadView('barang.cetak-pdf', [
+            'barang' => $barang,
+            'judul' => 'Laporan Data Barang Inventaris UIN Raden Fatah',
+            'tanggal' => now()->translatedFormat('d F Y')
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->stream('Data-Barang.pdf');
+    }
+
+    public function cetakLaporan(Request $request)
+    {
+        $query = Barang::with('ruang.gedung.fakultas');
+
+        // Filter fakultas, gedung, ruang (optional)
+        if ($request->filled('fakultas')) {
+            $query->whereHas('ruang.gedung.fakultas', fn($q) => $q->where('id_fakultas', $request->fakultas));
+        }
+        if ($request->filled('gedung')) {
+            $query->whereHas('ruang.gedung', fn($q) => $q->where('id_gedung', $request->gedung));
+        }
+        if ($request->filled('ruang')) {
+            $query->where('id_ruang', $request->ruang);
+        }
+
+        $barang = $query->orderBy('id_ruang')->get()->groupBy('id_ruang');
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('barang.cetak-laporan', [
+            'barangGroup' => $barang,
+            'tanggalCetak' => now()->translatedFormat('F Y'),
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Laporan-Barang-Ruangan.pdf');
+    }
+
 }

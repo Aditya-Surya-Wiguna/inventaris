@@ -20,6 +20,16 @@
   <a href="{{ route('barang.cetak.barcode', request()->query()) }}" class="btn btn-success">
     <i class="bi bi-upc-scan"></i> Cetak Barcode
   </a>
+
+  <a href="{{ route('barang.cetak.pdf', request()->query()) }}" 
+    class="btn btn-danger">
+    <i class="bi bi-file-earmark-pdf"></i> Cetak PDF
+  </a>
+  
+  <a href="{{ route('barang.cetak.laporan', request()->query()) }}" class="btn btn-secondary">
+    <i class="bi bi-file-earmark-text"></i> Cetak Laporan Barang
+  </a>
+
 </div>
 
 
