@@ -10,17 +10,44 @@ use App\Models\Gedung;
 use App\Models\Fakultas;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class BarangPindahController extends Controller
 {
     /**
      * Tampilkan daftar semua barang pindah
      */
-    public function index()
+    public function index(Request $request)
     {
-        $barangPindah = BarangPindah::with(['barang.ruang.gedung.fakultas', 'asal.gedung.fakultas', 'tujuan.gedung.fakultas'])
-            ->latest()
-            ->get();
+        $query = BarangPindah::with(['barang.ruang.gedung.fakultas', 'asal.gedung.fakultas', 'tujuan.gedung.fakultas']);
+
+        // 🔍 Filter berdasarkan tanggal
+        if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
+            $query->whereBetween('tanggal_pindah', [$request->tanggal_awal, $request->tanggal_akhir]);
+        }
+
+        // 🔍 Filter berdasarkan nama barang
+        if ($request->filled('nama_barang')) {
+            $query->whereHas('barang', function ($q) use ($request) {
+                $q->where('nama_barang', 'like', '%' . $request->nama_barang . '%');
+            });
+        }
+
+        // 🔍 Filter berdasarkan ruang asal
+        if ($request->filled('ruang_asal')) {
+            $query->whereHas('asal', function ($q) use ($request) {
+                $q->where('nama_ruang', 'like', '%' . $request->ruang_asal . '%');
+            });
+        }
+
+        // 🔍 Filter berdasarkan ruang tujuan
+        if ($request->filled('ruang_tujuan')) {
+            $query->whereHas('tujuan', function ($q) use ($request) {
+                $q->where('nama_ruang', 'like', '%' . $request->ruang_tujuan . '%');
+            });
+        }
+
+        $barangPindah = $query->latest()->get();
 
         return view('barang_pindah.index', compact('barangPindah'));
     }
@@ -87,4 +114,45 @@ class BarangPindahController extends Controller
         $ruang = Ruang::where('id_gedung', $id_gedung)->get();
         return response()->json($ruang);
     }
+
+
+    public function cetak(Request $request)
+    {
+        $query = BarangPindah::with(['barang.ruang.gedung.fakultas', 'asal.gedung.fakultas', 'tujuan.gedung.fakultas']);
+
+        // 🔍 Filter berdasarkan tanggal
+        if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
+            $query->whereBetween('tanggal_pindah', [$request->tanggal_awal, $request->tanggal_akhir]);
+        }
+
+        // 🔍 Filter nama barang
+        if ($request->filled('nama_barang')) {
+            $query->whereHas('barang', function ($q) use ($request) {
+                $q->where('nama_barang', 'like', '%' . $request->nama_barang . '%');
+            });
+        }
+
+        // 🔍 Filter ruang asal
+        if ($request->filled('ruang_asal')) {
+            $query->whereHas('asal', function ($q) use ($request) {
+                $q->where('nama_ruang', 'like', '%' . $request->ruang_asal . '%');
+            });
+        }
+
+        // 🔍 Filter ruang tujuan
+        if ($request->filled('ruang_tujuan')) {
+            $query->whereHas('tujuan', function ($q) use ($request) {
+                $q->where('nama_ruang', 'like', '%' . $request->ruang_tujuan . '%');
+            });
+        }
+
+        $barangPindah = $query->get();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('barang_pindah.cetak', compact('barangPindah'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Laporan_Barang_Pindah.pdf');
+    }
+
+
 }

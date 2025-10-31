@@ -63,8 +63,8 @@
     </td>
     <td class="kop-text">
       <h2>UNIVERSITAS ISLAM NEGERI RADEN FATAH PALEMBANG</h2>
-      <p><strong>Fakultas:</strong> {{ $fakultas->nama_fakultas ?? '-' }}</p>
-      <p>Jl. Prof. K.H. Zainal Abidin Fikri, KM. 3,5 Palembang, Sumatera Selatan</p>
+      <p><strong>Fakultas {{ $fakultas->nama_fakultas ?? '-' }} </strong></p>
+      <p>Jalan Prof.K.H.Zainal Abidin Fikri Km.3, RW.5, 5 Ulu, Kecamatan Seberang Ulu I, Kota Palembang, Sumatera Selatan 30267</p>
     </td>
   </tr>
 </table>

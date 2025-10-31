@@ -41,19 +41,29 @@
     </style>
 </head>
 <body>
+
+@php
+    use Milon\Barcode\Facades\DNS2D;
+    use Carbon\Carbon;
+@endphp
+
     <h3>Daftar Barcode Barang</h3>
 
     <div class="barcode-container">
         @foreach($barang as $b)
             <div class="item">
                 {{-- Generate QR menggunakan milon/barcode --}}
-                <img src="data:image/png;base64,{{ DNS2D::getBarcodePNG(route('barang.show', $b->id_barang), 'QRCODE') }}" alt="QR Code">
+                <img 
+                    src="data:image/png;base64,{{ \Milon\Barcode\DNS2D::getBarcodePNG(route('barang.show', $b->id_barang), 'QRCODE') }}" 
+                    alt="QR Code"
+                >
                 <div class="kode">
                     {{ $b->kode_barang }} -
-                    {{ $b->tanggal_masuk ? \Carbon\Carbon::parse($b->tanggal_masuk)->format('Y') : 'N/A' }}
+                    {{ $b->tanggal_masuk ? Carbon::parse($b->tanggal_masuk)->format('Y') : 'N/A' }}
                 </div>
             </div>
         @endforeach
     </div>
+
 </body>
 </html>

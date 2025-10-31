@@ -58,13 +58,24 @@ class BarangController extends Controller
         // ✅ Data filter dinamis
         $fakultas = Fakultas::whereHas('gedung.ruang.barang')->get();
         $gedung = Gedung::whereHas('ruang.barang')->get();
-        $ruang = Ruang::whereHas('barang')->get();
 
-        // Kondisi unik
+        // 🧩 Tambahkan label ruang yang lebih informatif
+        $ruang = Ruang::with('gedung.fakultas')
+            ->whereHas('barang')
+            ->get()
+            ->map(function ($r) {
+                $fak = $r->gedung->fakultas->kode_fakultas ?? '-';
+                $ged = $r->gedung->kode_gedung ?? '-';
+                $r->label_ruang = "{$r->nama_ruang} ({$fak} - Gedung {$ged})";
+                return $r;
+            });
+
+        // 🔸 Ambil kondisi unik
         $kondisiList = Barang::select('kondisi')->distinct()->pluck('kondisi');
 
         return view('barang.index', compact('barang', 'fakultas', 'gedung', 'ruang', 'kondisiList'));
     }
+
 
     // =======================
     // CREATE
@@ -196,7 +207,7 @@ class BarangController extends Controller
     public function barcode($id)
     {
         $barang = Barang::findOrFail($id);
-        $qr = DNS2D::getBarcodePNG(route('barang.show', $barang->id_barang), 'QRCODE');
+        $qr = \Milon\Barcode\DNS2D::getBarcodePNG(route('barang.show', $barang->id_barang), 'QRCODE');
         return view('barang.barcode', compact('barang', 'qr'));
     }
 
@@ -312,12 +323,67 @@ class BarangController extends Controller
 
         $barang = $query->orderBy('id_ruang')->get()->groupBy('id_ruang');
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('barang.cetak-laporan', [
+        $pdf = Pdf::loadView('barang.cetak-laporan', [
             'barangGroup' => $barang,
             'tanggalCetak' => now()->translatedFormat('F Y'),
         ])->setPaper('a4', 'portrait');
 
         return $pdf->stream('Laporan-Barang-Ruangan.pdf');
     }
+
+    // ==========================
+    // CREATE MULTIPLE
+    // ==========================
+    public function createMultiple()
+    {
+        $fakultas = Fakultas::all();
+        return view('barang.create-multiple', compact('fakultas'));
+    }
+
+    // ==========================
+    // STORE MULTIPLE
+    // ==========================
+    public function storeMultiple(Request $request)
+    {
+        $validated = $request->validate([
+            'id_ruang' => 'required|exists:ruang,id_ruang',
+            'foto_surat' => 'required|file|mimes:jpg,png,pdf',
+            'barang.*.nama_barang' => 'required|string',
+            'barang.*.merek_tipe' => 'nullable|string',
+            'barang.*.tanggal_masuk' => 'nullable|date',
+            'barang.*.jumlah' => 'required|integer|min:1',
+            'barang.*.nomor_bmn' => 'nullable|string',
+            'barang.*.kondisi' => 'required|in:B,RR,RB',
+            'barang.*.foto_barang' => 'nullable|image|mimes:jpg,png'
+        ]);
+
+        // Upload surat sekali
+        $pathSurat = $request->file('foto_surat')->store('surat', 'public');
+
+        foreach ($request->barang as $data) {
+            $fotoBarangPath = null;
+            if (isset($data['foto_barang'])) {
+                $fotoBarangPath = $data['foto_barang']->store('barang', 'public');
+            }
+
+            Barang::create([
+                'kode_barang' => 'BRG-' . str_pad(Barang::count() + 1, 6, '0', STR_PAD_LEFT),
+                'nama_barang' => $data['nama_barang'],
+                'merek_tipe' => $data['merek_tipe'] ?? null,
+                'tanggal_masuk' => $data['tanggal_masuk'] ?? null,
+                'jumlah' => $data['jumlah'],
+                'nomor_bmn' => $data['nomor_bmn'] ?? null,
+                'kondisi' => $data['kondisi'],
+                'id_ruang' => $request->id_ruang,
+                'foto_surat' => $pathSurat,
+                'foto_barang' => $fotoBarangPath,
+            ]);
+        }
+
+        return redirect()->route('barang.index')->with('success', 'Semua barang berhasil ditambahkan!');
+    }
+
+
+
 
 }

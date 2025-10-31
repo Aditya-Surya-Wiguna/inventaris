@@ -11,31 +11,47 @@
   </div>
 @endif
 
-<div class="d-flex justify-content-between mb-3">
-  <a href="{{ route('barang.create') }}" class="btn btn-primary">
-    <i class="bi bi-plus-lg"></i> Tambah Barang
-  </a>
+{{-- ===============================
+     Tombol Aksi di Bagian Atas
+   =============================== --}}
+<div class="d-flex justify-content-between mb-3 flex-wrap gap-2">
+  <div class="d-flex gap-2 flex-wrap">
+    {{-- 🔹 Tambah Barang Biasa --}}
+    <a href="{{ route('barang.create') }}" class="btn btn-primary">
+      <i class="bi bi-plus-lg"></i> Tambah Barang
+    </a>
 
-  {{-- Tombol Cetak Barcode --}}
+    {{-- 🔹 Tambah Banyak Barang Sekaligus --}}
+    <a href="{{ route('barang.createMultiple') }}" class="btn btn-outline-primary">
+      <i class="bi bi-plus-square-dotted"></i> Tambah Banyak Barang
+    </a>
+  </div>
+
+  {{-- 🔹 Tombol Cetak --}}
+<div class="d-flex gap-2 flex-wrap">
   <a href="{{ route('barang.cetak.barcode', request()->query()) }}" class="btn btn-success">
     <i class="bi bi-upc-scan"></i> Cetak Barcode
   </a>
 
-  <a href="{{ route('barang.cetak.pdf', request()->query()) }}" 
-    class="btn btn-danger">
+  <a href="{{ route('barang.cetak.pdf', request()->query()) }}" class="btn btn-danger">
     <i class="bi bi-file-earmark-pdf"></i> Cetak PDF
   </a>
   
   <a href="{{ route('barang.cetak.laporan', request()->query()) }}" class="btn btn-secondary">
-    <i class="bi bi-file-earmark-text"></i> Cetak Laporan Barang
+    <i class="bi bi-file-earmark-text"></i> Cetak Laporan PDF
   </a>
 
 </div>
 
+</div>
 
+{{-- ===============================
+     FILTER & PENCARIAN
+   =============================== --}}
 <div class="card mb-3 shadow-sm">
   <div class="card-body">
     <form method="GET" action="{{ route('barang.index') }}" class="row g-2 align-items-end">
+      {{-- FAKULTAS --}}
       <div class="col-md-2">
         <label class="form-label mb-1">Fakultas</label>
         <select name="fakultas" id="fakultas" class="form-select">
@@ -48,30 +64,34 @@
         </select>
       </div>
 
+      {{-- GEDUNG --}}
       <div class="col-md-2">
         <label class="form-label mb-1">Gedung</label>
         <select name="gedung" id="gedung" class="form-select">
           <option value="">Semua</option>
           @foreach($gedung as $g)
             <option value="{{ $g->id_gedung }}" {{ request('gedung') == $g->id_gedung ? 'selected' : '' }}>
-              {{ $g->kode_gedung }} ({{ $g->fakultas->kode_fakultas }})
+              Gedung {{ $g->kode_gedung }} ({{ $g->fakultas->kode_fakultas }})
             </option>
           @endforeach
         </select>
       </div>
 
-      <div class="col-md-2">
+      {{-- RUANG --}}
+      <div class="col-md-3">
         <label class="form-label mb-1">Ruang</label>
         <select name="ruang" id="ruang" class="form-select">
           <option value="">Semua</option>
           @foreach($ruang as $r)
             <option value="{{ $r->id_ruang }}" {{ request('ruang') == $r->id_ruang ? 'selected' : '' }}>
-              {{ $r->nama_ruang }}
+              {{ $r->nama_ruang }} 
+              ({{ $r->gedung->fakultas->kode_fakultas ?? '-' }} - Gedung {{ $r->gedung->kode_gedung ?? '-' }})
             </option>
           @endforeach
         </select>
       </div>
 
+      {{-- KONDISI --}}
       <div class="col-md-2">
         <label class="form-label mb-1">Kondisi</label>
         <select name="kondisi" class="form-select">
@@ -84,23 +104,26 @@
         </select>
       </div>
 
+      {{-- PENCARIAN --}}
       <div class="col-md-2">
         <label class="form-label mb-1">Cari Barang</label>
         <input type="text" name="search" class="form-control" value="{{ request('search') }}" placeholder="Nama / Kode">
       </div>
 
-      <div class="col-md-2 text-end">
-        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-filter"></i> Filter</button>
+      {{-- AKSI FILTER --}}
+      <div class="col-md-1 text-end">
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-filter"></i></button>
         <a href="{{ route('barang.index') }}" class="btn btn-outline-secondary w-100 mt-2">
-          <i class="bi bi-arrow-clockwise"></i> Reset
+          <i class="bi bi-arrow-clockwise"></i>
         </a>
       </div>
     </form>
   </div>
 </div>
 
-
-
+{{-- ===============================
+     TABEL DATA BARANG
+   =============================== --}}
 <div class="card shadow-sm">
   <div class="card-body table-responsive">
     <table class="table table-bordered align-middle">
@@ -124,6 +147,7 @@
           <td>{{ $b->nama_barang }}</td>
           <td>{{ $b->merek_tipe ?? '-' }}</td>
 
+          {{-- KONDISI --}}
           <td class="text-center">
             @if($b->kondisi == 'B')
               <span class="badge bg-success">Baik</span>
@@ -134,13 +158,12 @@
             @endif
           </td>
 
-          {{-- 📍 Lokasi tampil ringkas: Fakultas/Gedung/Ruang --}}
+          {{-- LOKASI --}}
           <td class="text-center">
             @if ($b->ruang)
               <small>
-                {{ $b->ruang->gedung->fakultas->kode_fakultas ?? '-' }}/
-                {{ $b->ruang->gedung->kode_gedung ?? '-' }}/
-                {{ $b->ruang->nama_ruang ?? '-' }}
+                {{ $b->ruang->nama_ruang }} 
+                ({{ $b->ruang->gedung->fakultas->kode_fakultas ?? '-' }} - Gedung {{ $b->ruang->gedung->kode_gedung ?? '-' }})
               </small>
             @else
               <small>-</small>
