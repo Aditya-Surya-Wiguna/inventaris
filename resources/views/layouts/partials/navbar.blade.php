@@ -1,30 +1,43 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top px-3 py-2">
   <div class="container-fluid">
-    {{-- BRAND / LOGO --}}
-    <span class="navbar-brand fw-bold text-primary">
-      <i class="bi bi-box-seam-fill me-1 text-primary"></i> Gudang UIN Raden Fatah
+    {{-- ================= BRAND / LOGO ================= --}}
+    <span class="navbar-brand fw-bold text-primary d-flex align-items-center">
+      <i class="bi bi-box-seam-fill me-2 fs-5 text-primary"></i>
+      Gudang UIN Raden Fatah
     </span>
 
-    {{-- RIGHT SIDE --}}
+    {{-- ================= RIGHT SIDE ================= --}}
     <div class="d-flex align-items-center ms-auto gap-3">
 
       {{-- 🔔 NOTIFIKASI DROPDOWN --}}
       <div class="dropdown">
-        <button class="btn btn-light position-relative" data-bs-toggle="dropdown" aria-expanded="false">
+        <button id="notifButton" class="btn btn-light position-relative" data-bs-toggle="dropdown" aria-expanded="false">
           <i class="bi bi-bell-fill fs-5 text-secondary"></i>
+
+          {{-- 🔴 Badge Jumlah Notifikasi --}}
           @if($notifikasiCount > 0)
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger animate__animated">
               {{ $notifikasiCount }}
             </span>
           @endif
         </button>
+
+        {{-- 🔽 Dropdown List Notifikasi --}}
         <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="width: 280px;">
           <li class="dropdown-header fw-semibold">🔔 Notifikasi Terbaru</li>
+
           @forelse($notifikasi as $n)
             <li>
               <a class="dropdown-item small" href="{{ $n['link'] }}">
-                <i class="bi {{ $n['icon'] }} text-primary me-2"></i> {{ $n['pesan'] }}
-                <div class="text-muted small">{{ $n['waktu'] }}</div>
+                <div class="d-flex align-items-start">
+                  <i class="bi {{ $n['icon'] }} me-2 fs-5"></i>
+                  <div>
+                    <div class="fw-semibold">{{ $n['pesan'] }}</div>
+                    <div class="text-muted mt-1" style="font-size: 0.7rem;">
+                      📅 {{ $n['waktu'] }}
+                    </div>
+                  </div>
+                </div>
               </a>
             </li>
           @empty
@@ -49,7 +62,22 @@
           </li>
         </ul>
       </div>
-
     </div>
   </div>
 </nav>
+
+{{-- 🔧 Script untuk hilangkan badge notifikasi saat diklik --}}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const notifButton = document.getElementById('notifButton');
+    const notifBadge = document.getElementById('notifBadge');
+
+    if (notifButton && notifBadge) {
+      notifButton.addEventListener('click', function () {
+        // Tambahkan animasi hilang
+        notifBadge.classList.add('animate__fadeOut');
+        setTimeout(() => notifBadge.style.display = 'none', 500);
+      });
+    }
+  });
+</script>

@@ -3,115 +3,146 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use App\Models\Fakultas;
-use App\Models\Gedung;
-use App\Models\Ruang;
-use App\Models\Barang;
-use App\Models\BarangRusak;
-use App\Models\BarangPindah;
-use Carbon\Carbon;
 
-class DatabaseSeeder extends Seeder
+class DatabaseSeeder extends seeder
 {
     public function run(): void
     {
-        // =====================================================
-        // ADMIN GUDANG (tabel user)
-        // =====================================================
-        User::create([
-            'nama' => 'Admin Gudang',
-            'username' => 'admin',
-            'password' => Hash::make('admin123'),
+        // ================================
+        // TABEL USER
+        // ================================
+        DB::table('user')->insert([
+            [
+                'id_user' => 1,
+                'nama' => 'Admin Gudang',
+                'username' => 'admin',
+                'password' => '$2y$12$wz1FL7ApQFlpyRNJzeB69O7lZPY64E.XYppjOug0RQvh55u/QOWP6', // hash dari admin123
+                'remember_token' => null,
+                'created_at' => '2025-10-29 04:49:05',
+                'updated_at' => '2025-10-29 04:49:05',
+            ]
         ]);
 
-        // =====================================================
-        // DATA FAKULTAS, GEDUNG, DAN RUANG
-        // =====================================================
-        $daftarFakultas = [
-            ['kode_fakultas' => 'FSH', 'nama_fakultas' => 'Fakultas Syariah dan Hukum'],
-            ['kode_fakultas' => 'FEBI', 'nama_fakultas' => 'Fakultas Ekonomi dan Bisnis Islam'],
-            ['kode_fakultas' => 'FU', 'nama_fakultas' => 'Fakultas Ushuluddin'],
-            ['kode_fakultas' => 'FITK', 'nama_fakultas' => 'Fakultas Ilmu Tarbiyah dan Keguruan'],
-        ];
+        // ================================
+        // TABEL FAKULTAS
+        // ================================
+        DB::table('fakultas')->insert([
+            [
+                'id_fakultas' => 6,
+                'kode_fakultas' => 'SAINTEK',
+                'nama_fakultas' => 'Sains dan Teknologi',
+                'created_at' => '2025-10-31 05:55:24',
+                'updated_at' => '2025-10-31 05:55:24',
+            ]
+        ]);
 
-        foreach ($daftarFakultas as $fak) {
-            $fakultas = Fakultas::create($fak);
+        // ================================
+        // TABEL GEDUNG
+        // ================================
+        DB::table('gedung')->insert([
+            [
+                'id_gedung' => 10,
+                'id_fakultas' => 6,
+                'kode_gedung' => 'A',
+                'created_at' => '2025-10-31 05:55:40',
+                'updated_at' => '2025-10-31 05:55:40',
+            ]
+        ]);
 
-            foreach (['A', 'B'] as $kodeGedung) {
-                $gedung = Gedung::create([
-                    'id_fakultas' => $fakultas->id_fakultas,
-                    'kode_gedung' => $kodeGedung,
-                ]);
+        // ================================
+        // TABEL RUANG
+        // ================================
+        DB::table('ruang')->insert([
+            [
+                'id_ruang' => 31,
+                'id_gedung' => 10,
+                'nama_ruang' => 'Lobi Lt. 1',
+                'created_at' => '2025-10-31 06:23:29',
+                'updated_at' => '2025-10-31 06:23:29',
+            ],
+            [
+                'id_ruang' => 32,
+                'id_gedung' => 10,
+                'nama_ruang' => 'Lobi Lt. 2',
+                'created_at' => '2025-10-31 06:23:29',
+                'updated_at' => '2025-10-31 06:23:29',
+            ],
+        ]);
 
-                for ($i = 1; $i <= 3; $i++) {
-                    Ruang::create([
-                        'id_gedung' => $gedung->id_gedung,
-                        'nama_ruang' => "Ruang $kodeGedung-10$i",
-                    ]);
-                }
-            }
-        }
+        // ================================
+        // TABEL BARANG
+        // ================================
+        DB::table('barang')->insert([
+            [
+                'id_barang' => 23,
+                'kode_barang' => 'BRG-000001',
+                'nama_barang' => 'AC Central',
+                'merek_tipe' => 'Panasonic',
+                'tanggal_masuk' => '2025-10-31',
+                'jumlah' => 1,
+                'nomor_bmn' => '9780-2025001-128-246-7',
+                'kondisi' => 'RR',
+                'foto_surat' => 'surat/cnXgAeh6jCGwW4ieSpcgHwGrACTsDDsFrOjNGlMw.pdf',
+                'foto_barang' => 'rusak/TiYagH1s3UpfPLvmPebrXNrhb2SYLAIVzrz96ZNj.png',
+                'id_ruang' => 32,
+                'kode_barcode' => null,
+                'created_at' => '2025-10-31 07:11:37',
+                'updated_at' => '2025-10-31 08:28:27',
+            ]
+        ]);
 
-        // =====================================================
-        // DATA BARANG (15 data dummy)
-        // =====================================================
-        $ruangList = Ruang::all();
-        $faker = \Faker\Factory::create('id_ID');
-        $kode = 1;
+        // ================================
+        // TABEL BARANG PINDAH
+        // ================================
+        DB::table('barang_pindah')->insert([
+            [
+                'id_pindah' => 9,
+                'id_barang' => 23,
+                'id_ruang_asal' => 31,
+                'id_ruang_tujuan' => 32,
+                'file_surat' => 'surat_pindah/Pb0UNJHWhjviZa4fzPllNOScIO7nesFcfyeGRNIL.png',
+                'tanggal_pindah' => '2025-10-31',
+                'created_at' => '2025-10-31 08:03:06',
+                'updated_at' => '2025-10-31 08:03:06',
+            ]
+        ]);
 
-        foreach (range(1, 15) as $i) {
-            $ruang = $ruangList->random();
-            $kodeBarang = 'BRG-' . str_pad($kode++, 6, '0', STR_PAD_LEFT);
+        // ================================
+        // TABEL BARANG RUSAK
+        // ================================
+        DB::table('barang_rusak')->insert([
+            [
+                'id_rusak' => 11,
+                'id_barang' => 23,
+                'kondisi_awal' => 'B',
+                'kondisi_baru' => 'RR',
+                'foto_bukti' => 'rusak/TiYagH1s3UpfPLvmPebrXNrhb2SYLAIVzrz96ZNj.png',
+                'tanggal_catat' => '2025-10-31',
+                'created_at' => '2025-10-31 08:28:27',
+                'updated_at' => '2025-10-31 08:28:27',
+            ]
+        ]);
 
-            Barang::create([
-                'kode_barang'   => $kodeBarang,
-                'nama_barang'   => $faker->word() . ' ' . $faker->randomElement(['Printer', 'Laptop', 'Monitor', 'Meja', 'Kursi']),
-                'merek_tipe'    => $faker->randomElement(['Canon LBP2900', 'HP LaserJet 1020', 'Lenovo ThinkCentre', 'LG 24MP59G', 'IKEA Classic']),
-                'tanggal_masuk' => $faker->dateTimeBetween('-2 years', 'now'),
-                'jumlah'        => $faker->numberBetween(1, 10),
-                'nomor_bmn'     => $faker->optional()->numerify('BMN-####'),
-                'kondisi'       => $faker->randomElement(['B', 'B', 'RR', 'B', 'B']),
-                'foto_surat'    => null,
-                'foto_barang'   => null,
-                'id_ruang'      => $ruang->id_ruang,
-                'kode_barcode'  => "http://localhost:8000/barang/$kodeBarang",
-            ]);
-        }
-
-        // =====================================================
-        // DATA BARANG RUSAK & PINDAH (dummy)
-        // =====================================================
-        $daftarBarang = Barang::all();
-
-        // ---- Barang Rusak (5 data) ----
-        foreach ($daftarBarang->take(5) as $barang) {
-            BarangRusak::create([
-                'id_barang'     => $barang->id_barang,
-                'kondisi_awal'  => 'B',
-                'kondisi_baru'  => 'RR',
-                'foto_bukti'    => null,
-                'tanggal_catat' => Carbon::now()->subDays(rand(5, 100)),
-            ]);
-
-            $barang->update(['kondisi' => 'RR']);
-        }
-
-        // ---- Barang Pindah (5 data) ----
-        foreach ($daftarBarang->skip(5)->take(5) as $barang) {
-            $asal = $barang->id_ruang;
-            $tujuan = $ruangList->where('id_ruang', '!=', $asal)->random()->id_ruang;
-
-            BarangPindah::create([
-                'id_barang'       => $barang->id_barang,
-                'id_ruang_asal'   => $asal,
-                'id_ruang_tujuan' => $tujuan,
-                'file_surat'      => null,
-                'tanggal_pindah'  => Carbon::now()->subDays(rand(1, 30)),
-            ]);
-
-            $barang->update(['id_ruang' => $tujuan]);
-        }
+        // ================================
+        // TABEL NOTIFIKASI
+        // ================================
+        DB::table('notifikasis')->insert([
+            [
+                'pesan' => '1 barang rusak tercatat',
+                'icon' => 'bi-tools text-warning',
+                'link' => '/barang-rusak',
+                'status_baca' => 0,
+                'created_at' => now(),
+            ],
+            [
+                'pesan' => '1 barang telah dipindahkan',
+                'icon' => 'bi-truck text-primary',
+                'link' => '/barang-pindah',
+                'status_baca' => 0,
+                'created_at' => now(),
+            ]
+        ]);
     }
 }

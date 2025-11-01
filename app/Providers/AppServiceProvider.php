@@ -23,7 +23,21 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // 🔔 Membuat variabel notifikasi tersedia di semua view
+        /*
+        |--------------------------------------------------------------------------
+        | 🌍 Pengaturan Locale & Zona Waktu
+        |--------------------------------------------------------------------------
+        */
+        // Set locale Carbon & sistem ke Bahasa Indonesia
+        Carbon::setLocale('id');
+        setlocale(LC_TIME, 'id_ID.UTF-8');
+        date_default_timezone_set('Asia/Jakarta');
+
+        /*
+        |--------------------------------------------------------------------------
+        | 🔔 Variabel Notifikasi Global
+        |--------------------------------------------------------------------------
+        */
         View::composer('*', function ($view) {
             $barangRusak = BarangRusak::count();
             $barangPindah = BarangPindah::count();
@@ -35,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
                 $notifikasi[] = [
                     'icon'  => 'bi-tools text-warning',
                     'pesan' => "$barangRusak barang rusak tercatat.",
-                    'waktu' => Carbon::now()->diffForHumans(),
+                    'waktu' => Carbon::now()->translatedFormat('d F Y H:i'), // 🟢 Format Bahasa Indonesia
                     'link'  => route('barang-rusak.index'),
                 ];
             }
@@ -45,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
                 $notifikasi[] = [
                     'icon'  => 'bi-truck text-primary',
                     'pesan' => "$barangPindah barang telah dipindahkan.",
-                    'waktu' => Carbon::now()->diffForHumans(),
+                    'waktu' => Carbon::now()->translatedFormat('d F Y H:i'),
                     'link'  => route('barang-pindah.index'),
                 ];
             }

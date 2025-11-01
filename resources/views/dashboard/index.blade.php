@@ -5,32 +5,37 @@
 <h5 class="mb-3">📊 Dashboard Inventaris Gudang UIN Raden Fatah Palembang</h5>
 
 <style>
-  /* === Dashboard Styling Compact === */
+  /* === Dashboard Styling Compact & Clean === */
   .card-body {
     padding: 0.75rem !important;
   }
   .stat-icon {
-    font-size: 1.8rem; /* icon lebih kecil */
+    font-size: 1.6rem;
     margin-bottom: 4px;
   }
   .stat-value {
-    font-size: 1.3rem;
+    font-size: 1.15rem;
     font-weight: 600;
   }
   .stat-title {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     margin: 0;
   }
   canvas {
-    max-height: 160px !important; /* grafik kecil */
+    max-height: 160px !important;
   }
   .table-sm th, .table-sm td {
     padding: 4px 8px !important;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
   }
   .card-header {
     padding: 6px 10px !important;
     font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .badge {
+    font-size: 0.7rem;
+    font-weight: 500;
   }
 </style>
 
@@ -96,7 +101,7 @@
           <th>#</th>
           <th>Nama Barang</th>
           <th>Merek/Tipe</th>
-          <th>Tanggal</th>
+          <th>Tanggal Masuk</th>
           <th>Kondisi</th>
         </tr>
       </thead>
@@ -106,7 +111,9 @@
           <td>{{ $i + 1 }}</td>
           <td>{{ $b->nama_barang }}</td>
           <td>{{ $b->merek_tipe ?? '-' }}</td>
-          <td>{{ $b->tanggal_masuk ?? '-' }}</td>
+          <td>
+            {{ $b->tanggal_masuk ? \Carbon\Carbon::parse($b->tanggal_masuk)->translatedFormat('d F Y') : '-' }}
+          </td>
           <td>
             @if($b->kondisi == 'B')
               <span class="badge bg-success">Baik</span>
