@@ -148,7 +148,7 @@ class BarangPindahController extends Controller
 
         $barangPindah = $query->get();
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('barang_pindah.cetak', compact('barangPindah'))
+        $pdf = Pdf::loadView('barang_pindah.cetak', compact('barangPindah'))
             ->setPaper('a4', 'portrait');
 
         return $pdf->stream('Laporan_Barang_Pindah.pdf');
