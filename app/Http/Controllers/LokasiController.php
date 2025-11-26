@@ -9,18 +9,14 @@ use App\Models\Ruang;
 
 class LokasiController extends Controller
 {
-    // =======================
     // INDEX
-    // =======================
     public function index()
     {
         $fakultas = Fakultas::with('gedung.ruang')->get();
         return view('lokasi.index', compact('fakultas'));
     }
 
-    // =======================
     // CREATE
-    // =======================
     public function create()
     {
         $fakultas = Fakultas::all();
@@ -28,9 +24,7 @@ class LokasiController extends Controller
         return view('lokasi.create', compact('fakultas', 'gedung'));
     }
 
-    // =======================
     // STORE
-    // =======================
     public function store(Request $request)
     {
         $request->validate([
@@ -75,20 +69,37 @@ class LokasiController extends Controller
                 'nama_ruang.*' => 'required|string|max:100',
             ]);
 
+            $duplikat = [];
+
             foreach ($request->nama_ruang as $nama) {
+                $namaTrim = trim($nama);
+
+                // Cek apakah sudah ada ruang dengan nama sama di gedung ini
+                $cek = Ruang::where('id_gedung', $request->id_gedung)
+                    ->where('nama_ruang', $namaTrim)
+                    ->first();
+
+                if ($cek) {
+                    $duplikat[] = $namaTrim;
+                    continue;
+                }
+
                 Ruang::create([
                     'id_gedung' => $request->id_gedung,
-                    'nama_ruang' => trim($nama),
+                    'nama_ruang' => $namaTrim,
                 ]);
+            }
+
+            if (!empty($duplikat)) {
+                return redirect()->route('lokasi.index')
+                    ->with('warning', 'Beberapa ruang tidak disimpan karena duplikat: ' . implode(', ', $duplikat));
             }
 
             return redirect()->route('lokasi.index')->with('success', 'Beberapa ruang berhasil ditambahkan sekaligus.');
         }
     }
 
-    // =======================
     // DESTROY
-    // =======================
     public function destroy($id)
     {
         $tipe = request('tipe');
@@ -108,9 +119,7 @@ class LokasiController extends Controller
         }
     }
 
-    // =======================
     // AJAX DYNAMIC DATA
-    // =======================
     public function getGedung($id_fakultas)
     {
         return response()->json(

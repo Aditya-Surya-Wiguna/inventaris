@@ -9,43 +9,41 @@ use App\Models\Ruang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Milon\Barcode\Facades\DNS2D; // ✅ gunakan milon/barcode
+use Milon\Barcode\Facades\DNS2D;
 
 
 class BarangController extends Controller
 {
-    // =======================
     // INDEX
-    // =======================
     public function index(Request $request)
     {
         $query = Barang::with('ruang.gedung.fakultas');
 
-        // 🔍 Filter Fakultas
+        // Filter Fakultas
         if ($request->filled('fakultas')) {
             $query->whereHas('ruang.gedung.fakultas', function ($q) use ($request) {
                 $q->where('id_fakultas', $request->fakultas);
             });
         }
 
-        // 🔍 Filter Gedung
+        // Filter Gedung
         if ($request->filled('gedung')) {
             $query->whereHas('ruang.gedung', function ($q) use ($request) {
                 $q->where('id_gedung', $request->gedung);
             });
         }
 
-        // 🔍 Filter Ruang
+        // Filter Ruang
         if ($request->filled('ruang')) {
             $query->where('id_ruang', $request->ruang);
         }
 
-        // 🔍 Filter Kondisi
+        // Filter Kondisi
         if ($request->filled('kondisi')) {
             $query->where('kondisi', $request->kondisi);
         }
 
-        // 🔍 Pencarian
+        // Pencarian
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('nama_barang', 'like', "%{$request->search}%")
@@ -55,11 +53,11 @@ class BarangController extends Controller
 
         $barang = $query->orderBy('id_barang', 'desc')->get();
 
-        // ✅ Data filter dinamis
+        // Data filter dinamis
         $fakultas = Fakultas::whereHas('gedung.ruang.barang')->get();
         $gedung = Gedung::whereHas('ruang.barang')->get();
 
-        // 🧩 Tambahkan label ruang yang lebih informatif
+        // Tambahkan label ruang yang lebih informatif
         $ruang = Ruang::with('gedung.fakultas')
             ->whereHas('barang')
             ->get()
@@ -70,25 +68,20 @@ class BarangController extends Controller
                 return $r;
             });
 
-        // 🔸 Ambil kondisi unik
+        // Ambil kondisi unik
         $kondisiList = Barang::select('kondisi')->distinct()->pluck('kondisi');
 
         return view('barang.index', compact('barang', 'fakultas', 'gedung', 'ruang', 'kondisiList'));
     }
 
-
-    // =======================
     // CREATE
-    // =======================
     public function create()
     {
         $fakultas = Fakultas::all();
         return view('barang.create', compact('fakultas'));
     }
 
-    // =======================
     // STORE
-    // =======================
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -124,9 +117,7 @@ class BarangController extends Controller
         return redirect()->route('barang.index')->with('success', 'Barang berhasil ditambahkan.');
     }
 
-    // =======================
     // EDIT
-    // =======================
     public function edit($id)
     {
         $barang = Barang::with('ruang.gedung.fakultas')->findOrFail($id);
@@ -138,9 +129,7 @@ class BarangController extends Controller
         return view('barang.edit', compact('barang', 'fakultas', 'gedung', 'ruang'));
     }
 
-    // =======================
     // UPDATE
-    // =======================
     public function update(Request $request, $id)
     {
         $barang = Barang::findOrFail($id);
@@ -172,9 +161,7 @@ class BarangController extends Controller
         return redirect()->route('barang.index')->with('success', 'Barang berhasil diperbarui.');
     }
 
-    // =======================
     // DESTROY
-    // =======================
     public function destroy($id)
     {
         $barang = Barang::findOrFail($id);
@@ -186,9 +173,7 @@ class BarangController extends Controller
         return redirect()->route('barang.index')->with('success', 'Barang berhasil dihapus.');
     }
 
-    // =======================
     // SHOW
-    // =======================
     public function show($id)
     {
         $barang = Barang::with([
@@ -201,9 +186,7 @@ class BarangController extends Controller
         return view('barang.show', compact('barang'));
     }
 
-    // =======================
     // BARCODE (1 item)
-    // =======================
     public function barcode($id)
     {
         $barang = Barang::findOrFail($id);
@@ -211,14 +194,12 @@ class BarangController extends Controller
         return view('barang.barcode', compact('barang', 'qr'));
     }
 
-    // =======================
     // CETAK BARCODE (semua / hasil filter)
-    // =======================
     public function cetakBarcode(Request $request)
     {
         $query = Barang::query();
 
-        // Filter sama seperti index()
+        // Filter
         if ($request->filled('fakultas')) {
             $query->whereHas('ruang.gedung.fakultas', function ($q) use ($request) {
                 $q->where('id_fakultas', $request->fakultas);
@@ -242,22 +223,32 @@ class BarangController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('nama_barang', 'like', "%{$request->search}%")
-                    ->orWhere('kode_barang', 'like', "%{$request->search}%");
+                ->orWhere('kode_barang', 'like', "%{$request->search}%");
             });
         }
 
         $barang = $query->orderBy('id_barang', 'asc')->get();
 
-        // Buat PDF berisi semua barcode
-        $pdf = Pdf::loadView('barang.cetak-barcode', compact('barang'))
-            ->setPaper('a4', 'portrait');
+        //  Ambil ukuran QR (default sedang)
+        $ukuran = $request->get('ukuran_qr', 'sedang');
+
+        //  Kirim flag 'pdf' agar form tidak dirender di view
+        $pdf = Pdf::loadView('barang.cetak-barcode', [
+                'barang' => $barang,
+                'ukuran_qr' => $ukuran,
+                'pdf' => true
+            ])
+            ->setPaper('a4', 'portrait')
+            ->setOption('margin-top', 5)
+            ->setOption('margin-bottom', 5)
+            ->setOption('margin-left', 6)
+            ->setOption('margin-right', 6);
 
         return $pdf->stream('Daftar-Barcode-Barang.pdf');
     }
 
-    // =======================
+
     // CETAK PDF DATA BARANG
-    // =======================
     public function cetakPdf(Request $request)
     {
         $query = Barang::with('ruang.gedung.fakultas');
@@ -301,7 +292,7 @@ class BarangController extends Controller
             'barang' => $barang,
             'judul' => 'Laporan Data Barang Inventaris UIN Raden Fatah',
             'tanggal' => now()->translatedFormat('d F Y')
-        ])->setPaper('a4', 'landscape');
+        ])->setPaper('a4', 'portrait');
 
         return $pdf->stream('Data-Barang.pdf');
     }
@@ -331,18 +322,14 @@ class BarangController extends Controller
         return $pdf->stream('Laporan-Barang-Ruangan.pdf');
     }
 
-    // ==========================
     // CREATE MULTIPLE
-    // ==========================
     public function createMultiple()
     {
         $fakultas = Fakultas::all();
         return view('barang.create-multiple', compact('fakultas'));
     }
 
-    // ==========================
     // STORE MULTIPLE
-    // ==========================
     public function storeMultiple(Request $request)
     {
         $validated = $request->validate([

@@ -4,9 +4,14 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use Illuminate\Foundation\AliasLoader;
 use App\Models\BarangRusak;
 use App\Models\BarangPindah;
 use Carbon\Carbon;
+
+// Tambahkan ini
+use Milon\Barcode\Facades\DNS1DFacade;
+use Milon\Barcode\Facades\DNS2DFacade;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,10 +33,17 @@ class AppServiceProvider extends ServiceProvider
         | 🌍 Pengaturan Locale & Zona Waktu
         |--------------------------------------------------------------------------
         */
-        // Set locale Carbon & sistem ke Bahasa Indonesia
         Carbon::setLocale('id');
         setlocale(LC_TIME, 'id_ID.UTF-8');
         date_default_timezone_set('Asia/Jakarta');
+
+        /*
+        |--------------------------------------------------------------------------
+        | 🧩 Daftarkan Alias Barcode (Laravel 12 tidak lagi punya config/app.php)
+        |--------------------------------------------------------------------------
+        */
+        AliasLoader::getInstance()->alias('DNS1D', DNS1DFacade::class);
+        AliasLoader::getInstance()->alias('DNS2D', DNS2DFacade::class);
 
         /*
         |--------------------------------------------------------------------------
@@ -44,17 +56,15 @@ class AppServiceProvider extends ServiceProvider
 
             $notifikasi = [];
 
-            // Barang rusak tercatat
             if ($barangRusak > 0) {
                 $notifikasi[] = [
                     'icon'  => 'bi-tools text-warning',
                     'pesan' => "$barangRusak barang rusak tercatat.",
-                    'waktu' => Carbon::now()->translatedFormat('d F Y H:i'), // 🟢 Format Bahasa Indonesia
+                    'waktu' => Carbon::now()->translatedFormat('d F Y H:i'),
                     'link'  => route('barang-rusak.index'),
                 ];
             }
 
-            // Barang yang dipindahkan
             if ($barangPindah > 0) {
                 $notifikasi[] = [
                     'icon'  => 'bi-truck text-primary',

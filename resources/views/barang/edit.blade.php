@@ -42,9 +42,7 @@
       </select>
     </div>
 
-    {{-- =========================
-         Lokasi Barang Dinamis
-       ========================= --}}
+    {{-- Lokasi Barang Dinamis --}}
     <div class="col-md-12 mt-2">
       <label class="form-label">Lokasi Barang</label>
       <div class="row g-3">

@@ -12,16 +12,12 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // ===============================
-        // 🌍 Set Locale & Zona Waktu
-        // ===============================
+        // Set Locale & Zona Waktu
         Carbon::setLocale('id');
         setlocale(LC_TIME, 'id_ID.UTF-8');
         date_default_timezone_set('Asia/Jakarta');
 
-        // ===============================
-        // 📦 Statistik Barang
-        // ===============================
+        // Statistik Barang
         $totalBarang  = Barang::count();
         $barangBaik   = Barang::where('kondisi', 'B')->count();
         $rusakRingan  = Barang::where('kondisi', 'RR')->count();
@@ -29,32 +25,24 @@ class DashboardController extends Controller
         $barangPindah = BarangPindah::count();
         $barangRusak  = BarangRusak::count();
 
-        // ===============================
-        // 📈 Grafik Kondisi Barang
-        // ===============================
+        // Grafik Kondisi Barang
         $chartLabels = ['Baik', 'Rusak Ringan', 'Rusak Berat'];
         $chartData   = [$barangBaik, $rusakRingan, $rusakBerat];
 
-        // ===============================
-        // 🏛️ Grafik Barang per Fakultas
-        // ===============================
+        //  Grafik Barang per Fakultas
         $fakultas = Fakultas::with('gedung.ruang.barang')->get();
         $fakultasLabels = $fakultas->pluck('nama_fakultas');
         $fakultasData = $fakultas->map(fn($f) =>
             $f->gedung->flatMap->ruang->flatMap->barang->count()
         );
 
-        // ===============================
-        // 🕒 Barang Terbaru Masuk
-        // ===============================
+        //  Barang Terbaru Masuk
         $barangTerbaru = Barang::latest()->take(5)->get();
 
-        // ===============================
-        // 🔔 Notifikasi (dengan format Indo)
-        // ===============================
+        //  Notifikasi dengan format Indo
         $notifikasi = [];
 
-        $waktu = Carbon::now()->translatedFormat('d F Y H:i'); // ✅ Format Indonesia
+        $waktu = Carbon::now()->translatedFormat('d F Y H:i'); 
 
         // Barang rusak berat → notifikasi merah
         if ($rusakBerat > 0) {
@@ -99,9 +87,7 @@ class DashboardController extends Controller
 
         $notifikasiCount = count($notifikasi);
 
-        // ===============================
-        // 📤 Kirim ke View
-        // ===============================
+        // Kirim ke View
         return view('dashboard.index', compact(
             'totalBarang', 'barangBaik', 'rusakRingan', 'rusakBerat',
             'barangPindah', 'barangRusak', 'chartLabels', 'chartData',

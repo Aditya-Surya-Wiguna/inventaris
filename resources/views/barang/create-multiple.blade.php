@@ -7,9 +7,7 @@
 <form action="{{ route('barang.storeMultiple') }}" method="POST" enctype="multipart/form-data" class="card shadow-sm p-4">
   @csrf
 
-  {{-- =========================
-       PILIH LOKASI + SURAT (sekali saja)
-     ========================= --}}
+  {{-- PILIH LOKASI + SURAT (sekali saja) --}}
   <div class="row g-3 mb-3">
     <div class="col-md-3">
       <label class="form-label">Fakultas</label>
@@ -41,9 +39,7 @@
     </div>
   </div>
 
-  {{-- =========================
-       DAFTAR BARANG (DINAMIS)
-     ========================= --}}
+  {{-- DAFTAR BARANG (DINAMIS) --}}
   <div id="barangList">
     <div class="card mb-3 border-1">
       <div class="card-body">

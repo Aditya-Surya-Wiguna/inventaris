@@ -21,26 +21,26 @@ class BarangPindahController extends Controller
     {
         $query = BarangPindah::with(['barang.ruang.gedung.fakultas', 'asal.gedung.fakultas', 'tujuan.gedung.fakultas']);
 
-        // 🔍 Filter berdasarkan tanggal
+        // Filter berdasarkan tanggal
         if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
             $query->whereBetween('tanggal_pindah', [$request->tanggal_awal, $request->tanggal_akhir]);
         }
 
-        // 🔍 Filter berdasarkan nama barang
+        // Filter berdasarkan nama barang
         if ($request->filled('nama_barang')) {
             $query->whereHas('barang', function ($q) use ($request) {
                 $q->where('nama_barang', 'like', '%' . $request->nama_barang . '%');
             });
         }
 
-        // 🔍 Filter berdasarkan ruang asal
+        // Filter berdasarkan ruang asal
         if ($request->filled('ruang_asal')) {
             $query->whereHas('asal', function ($q) use ($request) {
                 $q->where('nama_ruang', 'like', '%' . $request->ruang_asal . '%');
             });
         }
 
-        // 🔍 Filter berdasarkan ruang tujuan
+        // Filter berdasarkan ruang tujuan
         if ($request->filled('ruang_tujuan')) {
             $query->whereHas('tujuan', function ($q) use ($request) {
                 $q->where('nama_ruang', 'like', '%' . $request->ruang_tujuan . '%');
@@ -120,26 +120,26 @@ class BarangPindahController extends Controller
     {
         $query = BarangPindah::with(['barang.ruang.gedung.fakultas', 'asal.gedung.fakultas', 'tujuan.gedung.fakultas']);
 
-        // 🔍 Filter berdasarkan tanggal
+        // Filter berdasarkan tanggal
         if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
             $query->whereBetween('tanggal_pindah', [$request->tanggal_awal, $request->tanggal_akhir]);
         }
 
-        // 🔍 Filter nama barang
+        // Filter nama barang
         if ($request->filled('nama_barang')) {
             $query->whereHas('barang', function ($q) use ($request) {
                 $q->where('nama_barang', 'like', '%' . $request->nama_barang . '%');
             });
         }
 
-        // 🔍 Filter ruang asal
+        // Filter ruang asal
         if ($request->filled('ruang_asal')) {
             $query->whereHas('asal', function ($q) use ($request) {
                 $q->where('nama_ruang', 'like', '%' . $request->ruang_asal . '%');
             });
         }
 
-        // 🔍 Filter ruang tujuan
+        // Filter ruang tujuan
         if ($request->filled('ruang_tujuan')) {
             $query->whereHas('tujuan', function ($q) use ($request) {
                 $q->where('nama_ruang', 'like', '%' . $request->ruang_tujuan . '%');

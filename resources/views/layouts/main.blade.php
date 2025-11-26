@@ -10,168 +10,153 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css">
 
-  {{-- 🌟 Font Modern: Plus Jakarta Sans + Satoshi --}}
+  {{-- Font Modern --}}
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
 
   <style>
-    /* ========= GLOBAL FONT STYLE ========= */
     html, body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 14px; /* 🔥 lebih kecil & halus */
-      font-weight: 400;
+      font-size: 14px;
       color: #2c2c2c;
       background-color: #f9fafc;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
-      letter-spacing: 0.1px;
-      line-height: 1.55;
     }
 
-    h1, h2, h3, h4, .fw-bold, .navbar-brand, .sidebar .brand {
-      font-family: 'Satoshi', 'Poppins', sans-serif;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-    }
-
-    /* ========= SIDEBAR ========= */
+    /* ===== SIDEBAR ===== */
     .sidebar {
       width: 240px;
-      height: 100vh;
-      background: linear-gradient(180deg, #0d6efd, #003cba);
-      color: white;
+      background: linear-gradient(180deg, #022859, #004aad);
       position: fixed;
       top: 0;
       left: 0;
-      overflow-y: auto;
+      height: 100vh;
+      color: white;
+      transition: transform 0.35s ease, opacity 0.3s ease;
+      z-index: 1060;
       box-shadow: 2px 0 8px rgba(0,0,0,0.08);
-      z-index: 1030;
-      border-right: 1px solid rgba(255,255,255,0.1);
-      transition: all 0.3s ease;
-      font-size: 13px;
-    }
-
-    .sidebar .brand {
-      font-size: 1rem;
-      font-weight: 700;
-      padding: 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.15);
+      overflow-y: auto;
     }
 
     .sidebar .nav-link {
-      color: white;
-      font-weight: 500;
+      color: rgba(255,255,255,0.9);
       border-radius: 8px;
-      margin: 3px 10px;
+      margin: 4px 10px;
+      padding: 9px 14px;
       display: flex;
       align-items: center;
-      gap: 9px;
-      padding: 7px 12px;
-      font-size: 13px;
-      transition: all 0.25s ease;
+      font-weight: 500;
+      transition: all 0.3s ease;
     }
-
-    .sidebar .nav-link:hover,
+    .sidebar .nav-link:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateX(4px);
+    }
     .sidebar .nav-link.active {
-      background-color: rgba(255,255,255,0.18);
+      background: linear-gradient(145deg, rgba(255,255,255,0.22), rgba(255,255,255,0.1));
+      box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3), inset -3px -3px 6px rgba(255,255,255,0.15);
       transform: translateX(5px);
+      color: #fff;
+    }
+    .sidebar .nav-link.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 4px;
+      background: #fff;
+      border-radius: 0 3px 3px 0;
     }
 
-    /* ========= CONTENT ========= */
+    /* ===== OVERLAY ===== */
+    #sidebarOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(2px);
+      z-index: 1050;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #sidebarOverlay.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* ===== CONTENT ===== */
     .content {
-      margin-left: 250px;
+      margin-left: 240px;
       padding: 25px;
       transition: all 0.3s ease;
     }
 
-    /* ========= NAVBAR ========= */
-    .navbar {
-      backdrop-filter: blur(12px);
-      background-color: rgba(255,255,255,0.9) !important;
-      border-bottom: 1px solid #e4e6eb;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      z-index: 1050;
-      font-size: 13px;
+    /* ===== NAVBAR ===== */
+    .navbar-modern {
+      background: linear-gradient(90deg, #ffffff 0%, #d6e9ff 30%, #b3d4ff 65%, #0d47a1 100%);
+      color: #003cba;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 1100;
     }
 
-    .navbar .navbar-brand {
-      font-weight: 700;
-      color: #0d6efd !important;
-      font-size: 14px;
-    }
-
-    .navbar .btn-light:hover,
-    .navbar .btn-outline-primary:hover {
-      background-color: #0d6efd !important;
-      color: white !important;
-      transition: 0.3s;
-    }
-
-    /* ========= CARD & TEXT ========= */
-    .card {
-      border-radius: 12px;
+    #sidebarToggle {
+      background: rgba(13,110,253,0.1);
       border: none;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.04);
-      font-size: 13.2px;
+      color: #0d47a1;
+      transition: all 0.3s ease;
+    }
+    #sidebarToggle:hover {
+      background: rgba(13,110,253,0.2);
+      transform: scale(1.05);
     }
 
-    .card-title {
-      font-family: 'Satoshi', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      color: #333;
-    }
-
-    .table {
-      font-size: 13px; /* 🔹 ukuran tabel disesuaikan */
-    }
-
-    .table th, .table td {
-      vertical-align: middle;
-      padding: 8px 10px;
-    }
-
-    /* ========= BUTTON ========= */
-    .btn {
-      font-size: 13px;
-      padding: 6px 12px;
-      border-radius: 8px;
-    }
-
-    /* ========= FORM INPUT ========= */
-    .form-control, .form-select {
-      font-size: 13px;
-      border-radius: 6px;
-      padding: 6px 10px;
-    }
-
-    /* ========= DROPDOWN ========= */
-    .dropdown-menu {
-      border-radius: 10px;
-      font-size: 12.8px;
-      animation: fadeIn 0.25s ease;
-    }
-
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(-5px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
-
-    /* ========= RESPONSIVE ========= */
-    @media (max-width: 992px) {
-      .sidebar { width: 200px; }
-      .content { margin-left: 210px; padding: 15px; }
-    }
-
-    @media (max-width: 768px) {
+    /* ===== MOBILE RESPONSIVE ===== */
+    @media (max-width: 991.98px) {
       .sidebar {
-        position: fixed;
-        left: -240px;
-        transition: 0.3s;
+        transform: translateX(-260px);
+        opacity: 0;
       }
-      .sidebar.show { left: 0; }
-      .content { margin-left: 0; }
+      .sidebar.show {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      .content {
+        margin-left: 0;
+      }
+      body.no-scroll {
+        overflow: hidden;
+      }
+    }
+
+    /* ===== IMAGE MODAL (ANTI BACKDROP) ===== */
+    .modal-backdrop { display: none !important; }
+    .image-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .image-modal.active { display: flex !important; }
+    .image-modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .image-modal .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2rem;
+      color: #fff;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -180,10 +165,12 @@
   {{-- 🧭 SIDEBAR --}}
   @include('layouts.partials.sidebar')
 
+  {{-- 🌑 Overlay Transparan --}}
+  <div id="sidebarOverlay"></div>
+
   {{-- 🌐 NAVBAR + CONTENT --}}
   <div class="content">
     @include('layouts.partials.navbar')
-
     <div class="container-fluid mt-4 animate__animated animate__fadeIn">
       @yield('content')
     </div>
@@ -191,16 +178,62 @@
 
   {{-- ⚙️ SCRIPT --}}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const toggleBtn = document.querySelector('.navbar-toggler');
-      const sidebar = document.querySelector('.sidebar');
-      if (toggleBtn && sidebar) {
-        toggleBtn.addEventListener('click', function() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const toggle = document.getElementById('sidebarToggle');
+
+      // 🟦 Toggle Sidebar
+      if (toggle) {
+        toggle.addEventListener('click', function() {
           sidebar.classList.toggle('show');
+          overlay.classList.toggle('active');
+          document.body.classList.toggle('no-scroll');
         });
       }
+
+      // 🟨 Klik luar sidebar = tutup
+      if (overlay) {
+        overlay.addEventListener('click', function() {
+          sidebar.classList.remove('show');
+          overlay.classList.remove('active');
+          document.body.classList.remove('no-scroll');
+        });
+      }
+
+      // 🟩 Reset saat layar diperbesar lagi
+      window.addEventListener('resize', function() {
+        if (window.innerWidth > 992) {
+          sidebar.classList.remove('show');
+          overlay.classList.remove('active');
+          document.body.classList.remove('no-scroll');
+        }
+      });
+
+      // 🖼️ POPUP GAMBAR
+      const imageModal = document.createElement("div");
+      imageModal.classList.add("image-modal");
+      imageModal.innerHTML = `
+        <span class="close-btn">&times;</span>
+        <img src="" alt="Preview">
+      `;
+      document.body.appendChild(imageModal);
+
+      const modalImg = imageModal.querySelector("img");
+      const closeBtn = imageModal.querySelector(".close-btn");
+
+      document.body.addEventListener("click", function(e) {
+        if (e.target.classList.contains("preview-img")) {
+          modalImg.src = e.target.getAttribute("data-src") || e.target.src;
+          imageModal.classList.add("active");
+        }
+      });
+
+      closeBtn.addEventListener("click", () => imageModal.classList.remove("active"));
+      imageModal.addEventListener("click", (e) => {
+        if (e.target === imageModal) imageModal.classList.remove("active");
+      });
     });
   </script>
 

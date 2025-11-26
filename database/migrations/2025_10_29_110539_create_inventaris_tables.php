@@ -7,9 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        // ===========================================
         // USER (Admin Gudang)
-        // ===========================================
         Schema::create('user', function (Blueprint $t) {
             $t->id('id_user');
             $t->string('nama')->default('Admin Gudang');
@@ -19,9 +17,7 @@ return new class extends Migration {
             $t->timestamps();
         });
 
-        // ===========================================
         // FAKULTAS
-        // ===========================================
         Schema::create('fakultas', function (Blueprint $t) {
             $t->id('id_fakultas');
             $t->string('kode_fakultas', 20)->unique();
@@ -29,9 +25,7 @@ return new class extends Migration {
             $t->timestamps();
         });
 
-        // ===========================================
         // GEDUNG
-        // ===========================================
         Schema::create('gedung', function (Blueprint $t) {
             $t->id('id_gedung');
             $t->unsignedBigInteger('id_fakultas');
@@ -46,9 +40,7 @@ return new class extends Migration {
               ->cascadeOnDelete();
         });
 
-        // ===========================================
         // RUANG
-        // ===========================================
         Schema::create('ruang', function (Blueprint $t) {
             $t->id('id_ruang');
             $t->unsignedBigInteger('id_gedung');
@@ -62,9 +54,7 @@ return new class extends Migration {
               ->cascadeOnDelete();
         });
 
-        // ===========================================
         // DATA BARANG
-        // ===========================================
         Schema::create('barang', function (Blueprint $t) {
             $t->id('id_barang');
             $t->string('kode_barang', 30)->unique()->index();
@@ -86,9 +76,7 @@ return new class extends Migration {
               ->nullOnDelete();
         });
 
-        // ===========================================
         // BARANG RUSAK
-        // ===========================================
         Schema::create('barang_rusak', function (Blueprint $t) {
             $t->id('id_rusak');
             $t->unsignedBigInteger('id_barang');
@@ -104,9 +92,7 @@ return new class extends Migration {
               ->cascadeOnDelete();
         });
 
-        // ===========================================
         // BARANG PINDAH
-        // ===========================================
         Schema::create('barang_pindah', function (Blueprint $t) {
             $t->id('id_pindah');
             $t->unsignedBigInteger('id_barang');

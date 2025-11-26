@@ -2,61 +2,121 @@
 @section('title', 'Dashboard Gudang')
 
 @section('content')
-<h5 class="mb-3">📊 Dashboard Inventaris Gudang UIN Raden Fatah Palembang</h5>
+<h5 class="mb-3 fw-bold text-primary animate__animated animate__fadeInDown">
+  📊 DASHBOARD INVENTARIS UIN RADEN FATAH PALEMBANG
+</h5>
 
 <style>
-  /* === Dashboard Styling Compact & Clean === */
-  .card-body {
-    padding: 0.75rem !important;
+
+  .card-modern {
+    border: none;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+  }
+  .card-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  }
+
+  .stat-card {
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  }
+  .stat-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 1rem 1.2rem;
+  }
+  .stat-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
   }
   .stat-icon {
-    font-size: 1.6rem;
-    margin-bottom: 4px;
-  }
-  .stat-value {
-    font-size: 1.15rem;
-    font-weight: 600;
+    font-size: 2rem;
+    opacity: 0.9;
   }
   .stat-title {
-    font-size: 0.8rem;
-    margin: 0;
-  }
-  canvas {
-    max-height: 160px !important;
-  }
-  .table-sm th, .table-sm td {
-    padding: 4px 8px !important;
-    font-size: 0.78rem;
-  }
-  .card-header {
-    padding: 6px 10px !important;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 600;
+    letter-spacing: 0.3px;
   }
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 900;
+    text-align: right;
+  }
+
+  .card-header {
+    background: linear-gradient(90deg, #f0f6ff, #e9f1ff);
+    border-bottom: 1px solid #e0e0e0;
+    border-radius: 14px 14px 0 0;
+    font-weight: 700;
+    color: #0d47a1;
+    font-size: 0.95rem;
+  }
+
+  .table thead th {
+    font-weight: 800;
+    color: #000;
+    font-size: 0.85rem;
+    background: linear-gradient(90deg, #eaf2ff, #ffffff);
+    border-bottom: 2px solid #dee2e6;
+  }
+  .table-hover tbody tr:hover {
+    background: #f6faff !important;
+  }
+  .table-sm td {
+    vertical-align: middle;
+    font-size: 0.85rem;
+  }
+
   .badge {
-    font-size: 0.7rem;
-    font-weight: 500;
+    font-size: 0.95rem !important;
+    padding: 6px 12px;
+    font-weight: 600;
+    border-radius: 8px;
+  }
+
+  canvas {
+    max-height: 180px !important;
   }
 </style>
 
 {{-- ====== STATISTIK UTAMA ====== --}}
-<div class="row g-2 mb-3">
+<div class="row g-3 mb-4 animate__animated animate__fadeInUp">
   @php
     $cards = [
-      ['bg' => 'primary', 'icon' => 'bi-box-seam', 'title' => 'Total Barang', 'value' => $totalBarang],
-      ['bg' => 'success', 'icon' => 'bi-check-circle', 'title' => 'Barang Baik', 'value' => $barangBaik],
-      ['bg' => 'warning', 'icon' => 'bi-tools', 'title' => 'Rusak Ringan', 'value' => $rusakRingan],
-      ['bg' => 'danger', 'icon' => 'bi-x-circle', 'title' => 'Rusak Berat', 'value' => $rusakBerat],
+      ['bg' => 'linear-gradient(145deg, #0d6efd, #004aad)', 'icon' => 'bi-box-seam', 'title' => 'Total Barang', 'value' => $totalBarang],
+      ['bg' => 'linear-gradient(145deg, #198754, #0d683f)', 'icon' => 'bi-check-circle', 'title' => 'Barang Baik', 'value' => $barangBaik],
+      ['bg' => 'linear-gradient(145deg, #ffc107, #c59000)', 'icon' => 'bi-tools', 'title' => 'Rusak Ringan', 'value' => $rusakRingan],
+      ['bg' => 'linear-gradient(145deg, #dc3545, #a71d2a)', 'icon' => 'bi-x-circle', 'title' => 'Rusak Berat', 'value' => $rusakBerat],
     ];
   @endphp
 
   @foreach ($cards as $card)
-  <div class="col-3">
-    <div class="card text-white bg-{{ $card['bg'] }} text-center shadow-sm">
-      <div class="card-body p-2">
-        <i class="bi {{ $card['icon'] }} stat-icon"></i>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card" style="background: {{ $card['bg'] }}">
+      <div class="stat-body">
+        <div class="stat-left">
+          <i class="bi {{ $card['icon'] }} stat-icon"></i>
+          <p class="stat-title mb-0">{{ $card['title'] }}</p>
+        </div>
         <div class="stat-value">{{ $card['value'] }}</div>
-        <p class="stat-title">{{ $card['title'] }}</p>
       </div>
     </div>
   </div>
@@ -64,12 +124,10 @@
 </div>
 
 {{-- ====== GRAFIK ====== --}}
-<div class="row g-2 mb-3">
+<div class="row g-3 mb-4 animate__animated animate__fadeInUp">
   <div class="col-md-6">
-    <div class="card shadow-sm">
-      <div class="card-header bg-light">
-        📈 Grafik Kondisi Barang
-      </div>
+    <div class="card card-modern">
+      <div class="card-header">📈 <span class="fw-bold">Grafik Kondisi Barang</span></div>
       <div class="card-body text-center">
         <canvas id="chartKondisi"></canvas>
       </div>
@@ -77,10 +135,8 @@
   </div>
 
   <div class="col-md-6">
-    <div class="card shadow-sm">
-      <div class="card-header bg-light">
-        🏛️ Barang per Fakultas
-      </div>
+    <div class="card card-modern">
+      <div class="card-header">🏛️ <span class="fw-bold">Barang per Fakultas</span></div>
       <div class="card-body text-center">
         <canvas id="chartFakultas"></canvas>
       </div>
@@ -89,16 +145,16 @@
 </div>
 
 {{-- ====== TABEL BARANG TERBARU ====== --}}
-<div class="card shadow-sm">
-  <div class="card-header bg-light d-flex justify-content-between align-items-center">
-    <strong>🕒 Barang Terbaru Masuk</strong>
-    <a href="{{ route('barang.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+<div class="card card-modern animate__animated animate__fadeInUp">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span class="fw-bold">🕒 Barang Terbaru Masuk</span>
+    <a href="{{ route('barang.index') }}" class="btn btn-sm btn-outline-primary fw-semibold">Lihat Semua</a>
   </div>
   <div class="card-body p-2">
-    <table class="table table-sm table-hover mb-0 align-middle">
-      <thead class="table-light">
+    <table class="table table-sm table-hover mb-0 align-middle text-center">
+      <thead>
         <tr>
-          <th>#</th>
+          <th>No.</th>
           <th>Nama Barang</th>
           <th>Merek/Tipe</th>
           <th>Tanggal Masuk</th>
@@ -109,23 +165,21 @@
         @forelse($barangTerbaru as $i => $b)
         <tr>
           <td>{{ $i + 1 }}</td>
-          <td>{{ $b->nama_barang }}</td>
+          <td class="fw-semibold">{{ $b->nama_barang }}</td>
           <td>{{ $b->merek_tipe ?? '-' }}</td>
-          <td>
-            {{ $b->tanggal_masuk ? \Carbon\Carbon::parse($b->tanggal_masuk)->translatedFormat('d F Y') : '-' }}
-          </td>
+          <td>{{ $b->tanggal_masuk ? \Carbon\Carbon::parse($b->tanggal_masuk)->translatedFormat('d F Y') : '-' }}</td>
           <td>
             @if($b->kondisi == 'B')
-              <span class="badge bg-success">Baik</span>
+              <span class="badge bg-success shadow-sm">Baik</span>
             @elseif($b->kondisi == 'RR')
-              <span class="badge bg-warning text-dark">Ringan</span>
+              <span class="badge bg-warning text-dark shadow-sm">Ringan</span>
             @else
-              <span class="badge bg-danger">Berat</span>
+              <span class="badge bg-danger shadow-sm">Berat</span>
             @endif
           </td>
         </tr>
         @empty
-        <tr><td colspan="5" class="text-center text-muted">Belum ada data</td></tr>
+        <tr><td colspan="5" class="text-center text-muted py-3">Belum ada data</td></tr>
         @endforelse
       </tbody>
     </table>
@@ -148,7 +202,9 @@ new Chart(document.getElementById('chartKondisi'), {
   },
   options: {
     responsive: true,
-    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11, weight: '600' } } }
+    }
   }
 });
 
@@ -165,8 +221,8 @@ new Chart(document.getElementById('chartFakultas'), {
   options: {
     responsive: true,
     scales: {
-      y: { beginAtZero: true, ticks: { font: { size: 10 } } },
-      x: { ticks: { font: { size: 10 } } }
+      y: { beginAtZero: true, ticks: { font: { size: 11 } } },
+      x: { ticks: { font: { size: 11 } } }
     },
     plugins: { legend: { display: false } }
   }

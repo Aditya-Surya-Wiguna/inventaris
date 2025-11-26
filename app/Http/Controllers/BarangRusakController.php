@@ -11,26 +11,25 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class BarangRusakController extends Controller
 {
-    // ===============================
+
     // TAMPIL DATA BARANG RUSAK + FILTER
-    // ===============================
     public function index(Request $request)
     {
         $query = BarangRusak::with('barang.ruang.gedung.fakultas');
 
-        // 🔍 Filter tanggal
+        // Filter tanggal
         if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
             $query->whereBetween('tanggal_catat', [$request->tanggal_awal, $request->tanggal_akhir]);
         }
 
-        // 🔍 Filter nama barang
+        //  Filter nama barang
         if ($request->filled('nama_barang')) {
             $query->whereHas('barang', function ($q) use ($request) {
                 $q->where('nama_barang', 'like', '%' . $request->nama_barang . '%');
             });
         }
 
-        // 🔍 Filter kondisi baru
+        // Filter kondisi baru
         if ($request->filled('kondisi_baru')) {
             $query->where('kondisi_baru', $request->kondisi_baru);
         }
@@ -40,18 +39,14 @@ class BarangRusakController extends Controller
         return view('barang_rusak.index', compact('barangRusak'));
     }
 
-    // ===============================
     // FORM TAMBAH BARANG RUSAK
-    // ===============================
     public function create()
     {
         $barang = Barang::with('ruang.gedung.fakultas')->get();
         return view('barang_rusak.create', compact('barang'));
     }
 
-    // ===============================
     // SIMPAN DATA BARANG RUSAK
-    // ===============================
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -86,9 +81,7 @@ class BarangRusakController extends Controller
             ->with('success', 'Data barang rusak berhasil disimpan.');
     }
 
-    // ===============================
     // CETAK PDF BERDASARKAN FILTER
-    // ===============================
     public function cetak(Request $request)
     {
         $query = BarangRusak::with('barang.ruang.gedung.fakultas');
